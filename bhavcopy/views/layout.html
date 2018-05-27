@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>BhavCopy</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="static/css/main.css" />
+		<noscript><link rel="stylesheet" href="static/css/noscript.css" /></noscript>
+		{% block head %}
+		{% endblock %}
+	</head>
+	<body class="is-loading">
+	    {% block body %}
+		<div id="wrapper" class="fade-in">
+			<header id="header">
+				<a href="views/index.html" class="logo">Bhavcopy</a>
+			</header>
+			<nav id="nav">
+				<ul class="links">
+					<li class="active"><a href="views/index.html">BSE Equity</a></li>
+				</ul>
+				<ul class="icons">
+					<li><a href="https://github.com/iamneha" class="icon fa-github"><span class="label">GitHub</span></a></li>
+				</ul>
+			</nav>
+			<div id="main">
+			  {% block subbody %}
+		      {% endblock subbody %}
+		    </div>
+		{% endblock %}
+		</div>
+
+		<script src="static/js/jquery.min.js"></script>
+		<script src="static/js/jquery.scrolly.min.js"></script>
+		<script src="static/js/skel.min.js"></script>
+		<script src="static/js/util.js"></script>
+		<script src="static/js/main.js"></script>
+	</body>
+</html>
