@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block subbody %}
+  <body>
+    <div class="wrap">
+      <form action="/search" method="get" accept-charset="utf-8">
+        <div class="search">
+          <input type="text" name="pattern" class="searchTerm" placeholder="Search">
+          <button type="submit" class="searchButton"> <i class="icon fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div>
+      <table class="table-fill">
+        <thead>
+          <tr>
+            <th class="text-left">Code</th>
+            <th class="text-left">Name</th>
+            <th class="text-left">Open</th>
+            <th class="text-left">Close</th>
+            <th class="text-left">Low</th>
+            <th class="text-left">High</th>
+          </tr>
+        </thead>
+        <tbody class="table-hover">
+          {% for item in data %}
+          <tr>
+            <td class="text-left">{{ item['code'] }}</td>
+            <td class="text-left">{{ item['name'] }}</td>
+            <td class="text-left">{{ item['open'] }}</td>
+            <td class="text-left">{{ item['close'] }}</td>
+            <td class="text-left">{{ item['low'] }}</td>
+            <td class="text-left">{{ item['high'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+{% endblock %}
