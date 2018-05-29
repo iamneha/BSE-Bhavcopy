@@ -1,6 +1,7 @@
 import cherrypy
 import config
 import logging
+import threading
 from controllers.home import HomeController
 from models.bse_model import BSEModel
 from utils.data_fetcher import store_data
@@ -20,8 +21,7 @@ def start_server():
 
 try:
     logger.info("Downloading data.....")
-    store_data(BSEModel, input_date=None)
-    logger.info("FINISHED!")
+    threading.Thread(target=store_data, args=(BSEModel, )).start()
     application = start_server()
 except Exception as ex:
     logger.error('Error during run', ex)

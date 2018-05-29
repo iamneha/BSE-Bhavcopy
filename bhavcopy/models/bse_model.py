@@ -1,52 +1,65 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from limpyd import model
 import os
+import redis
+import pickle
 
-local_db = model.RedisDatabase(
-    host=os.getenv('DB_HOST') or 'localhost',
-    port=os.getenv('DB_PORT') or 6379,
-    db=os.getenv("DB_INDEX") or 0
-)
+DB = {
+        "host": os.getenv('DB_HOST') or 'localhost',
+        "port": os.getenv('DB_PORT') or 6379,
+        "db": os.getenv("DB_INDEX") or 0
+    }
 
 
-class BSEModel(model.RedisModel):
-    database = local_db
+class BSEModel():
+    database = DB
 
-    name = model.StringField(indexable=True)
-    code = model.StringField()
-    open_at = model.StringField()
-    close_at = model.StringField()
-    low = model.StringField()
-    high = model.StringField()
+    def __init__(self, data_object=None):
+        self.redis_client = redis.StrictRedis(**self.database)
+        self.data_object = data_object
+        if isinstance(self.data_object, (list, tuple)):
+            self.save_bulk()
+        elif isinstance(self.data_object, dict):
+            self.save()
 
-    def __repr__(self):
-        return str(self.hmget('name'))
+    def save(self):
+        self.name = self.data_object.get('name')
+        self.value = pickle.dumps(self.data_object.get('value'))
+        self.redis_client.set(self.name, self.value)
+
+    def save_bulk(self):
+        pipeline = self.redis_client.pipeline()
+        for obj in self.data_object:
+            _name = obj.get('name')
+            _value = pickle.dumps(obj.get('value'))
+            pipeline.set(_name, _value)
+        pipeline.execute()
+
+    def __iter__(self):
+        for key in self.redis_client.keys():
+            yield self.to_dict(key)
+
+    def to_dict(self, key):
+        _code, _open, _high, _low, _close = pickle.loads(
+            self.redis_client.get(key))
+        return {
+            'name': key.decode('utf-8'),
+            'code': _code,
+            'open': _open,
+            'close': _close,
+            'high': _high,
+            'low': _low
+        }
 
     @classmethod
     def search(cls, pattern):
         response = list()
-        for item in cls.collection().instances():
-            _name = item.name.get()
-            if _name and _name.lower().find(pattern.lower()) != -1:
-                response.append(cls.to_dict(item))
+        _cls = cls()
+        for _name in _cls.redis_client.keys():
+            if _name and _name.lower().find(pattern.lower().encode()) != -1:
+                response.append(_cls.to_dict(_name))
         return response
-
-    @staticmethod
-    def to_dict(obj):
-        return {
-            'name': obj.name.get(),
-            'code': obj.code.get(),
-            'open': obj.open_at.get(),
-            'close': obj.close_at.get(),
-            'high': obj.high.get(),
-            'low': obj.low.get()
-        }
-
-    def __iter__(self):
-        for obj in self.collection().instances():
-            yield self.to_dict(obj)
 
     @classmethod
     def limit(cls, num=10):

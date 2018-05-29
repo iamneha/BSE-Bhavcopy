@@ -5,6 +5,7 @@ import zipfile
 import io
 import csv
 import logging
+import time
 from datetime import datetime, timedelta
 from urllib.request import urlopen  # python3
 
@@ -51,16 +52,17 @@ def extract_data(input_date=None):
 
 
 def store_data(DBModel, input_date=None):
-    rows = extract_data(input_date)
-    for row in rows:
-        try:
-            DBModel(
-                code=row['SC_CODE'],
-                name=row['SC_NAME'],
-                open_at=row['OPEN'],
-                high=row['HIGH'],
-                low=row['LOW'],
-                close_at=row['CLOSE']
-            )
-        except Exception as e:
-            logger.error(str(e))
+    while True:
+        rows = extract_data(input_date)
+        db_input = [{
+            'name': row.get('SC_NAME'),
+            'value': [
+                row.get('SC_CODE'),
+                row.get('OPEN'),
+                row.get('HIGH'),
+                row.get('LOW'),
+                row.get('CLOSE')
+            ]
+        } for row in rows]
+        DBModel(db_input)
+        time.sleep(86400)
