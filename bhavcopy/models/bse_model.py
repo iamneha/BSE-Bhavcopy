@@ -5,6 +5,7 @@ import os
 import redis
 import pickle
 
+
 DB = {
         "host": os.getenv('DB_HOST') or 'localhost',
         "port": os.getenv('DB_PORT') or 6379,
@@ -12,7 +13,7 @@ DB = {
     }
 
 
-class BSEModel():
+class BSEModel:
     database = DB
 
     def __init__(self, data_object=None):
@@ -44,12 +45,12 @@ class BSEModel():
         _code, _open, _high, _low, _close = pickle.loads(
             self.redis_client.get(key))
         return {
-            'name': key.decode('utf-8'),
-            'code': _code,
-            'open': _open,
-            'close': _close,
-            'high': _high,
-            'low': _low
+                'name': key.decode('utf-8'),
+                'code': _code,
+                'open': _open,
+                'close': _close,
+                'high': _high,
+                'low': _low
         }
 
     @classmethod

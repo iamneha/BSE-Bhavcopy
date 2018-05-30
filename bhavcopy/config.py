@@ -6,7 +6,7 @@ base_path = os.path.abspath(os.path.dirname(__file__))
 config = {
     'global': {
         'server.socket_host': '0.0.0.0',
-        'server.socket_port': 8000,
+        'server.socket_port': int(os.getenv('PORT')),
         'server.thread_pool': 4,
         'tools.trailing_slash.on': False,
         'tools.staticdir.root': base_path
