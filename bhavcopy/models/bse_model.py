@@ -63,10 +63,21 @@ class BSEModel:
         return response
 
     @classmethod
-    def limit(cls, num=10):
-        _resp = list()
-        for index, item in enumerate(cls()):
-            if num <= index:
-                return _resp
-            _resp.append(item)
-        return _resp
+     def limit(cls, num=10, sort=False, field=None, order=None):
+         _resp = list()
+         _cls = cls()
+         if sort:
+             return cls.sorted_resp(list(_cls), field, order)[:num]
+         for index, item in enumerate(_cls):
+             if num <= index:
+                 return _resp
+             _resp.append(item)
+         return _resp
+
+     @staticmethod
+     def sorted_resp(resp, field, order):
+         """
+         field: field can be any column on which we want sorting `low`|`high`.
+         order: order is sorting order `asc`|`desc`.
+         """
+         return sorted(resp, key=lambda k: float(k[field]), reverse=order == 'desc')
